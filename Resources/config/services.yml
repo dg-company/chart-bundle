@@ -1,0 +1,26 @@
+services:
+
+    # FACTORIES
+    dgc_chart.factory.aggregator:
+        class: DGC\ChartBundle\Aggregator\AggregatorFactory
+        arguments:
+          - "@logger"
+
+    dgc_chart.factory.chart:
+        class: DGC\ChartBundle\Chart\ChartFactory
+        arguments:
+          - "@templating"
+          - "@request_stack"
+
+    dgc_chart.factory.filter:
+        class: DGC\ChartBundle\Filter\FilterFactory
+        arguments:
+          - '@templating'
+          - '@request_stack'
+
+    # TWIG EXTENSIONS
+    dgc_chart.twig.dgc_chart_extension:
+        class: DGC\ChartBundle\Twig\ChartExtension
+        arguments: [ "@router", "@request_stack" ]
+        tags:
+            - { name: twig.extension }

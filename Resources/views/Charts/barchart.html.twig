@@ -1,0 +1,46 @@
+<script type="text/javascript">
+$(function() {
+
+    var bar = new Morris.Bar({
+        element: '{{ data.id }}',
+        resize: true,
+        data: [
+            {% for x,yValues in data.values %}
+            {
+                x: '{{ x }}',
+
+                {% set i = 0 %}
+                {% for y in yValues %}
+                y{{ i }}: '{{ y }}',
+                {% set i = i+1 %}
+                {% endfor %}
+
+            },
+            {% endfor %}
+        ],
+        barColors: [
+            '#00a65a',
+            '#f56954',
+            '#57B4DE'
+        ],
+        xkey: 'x',
+        ykeys: [
+            {% set i = 0 %}
+            {% for y in data.values|first %}
+            'y{{ i }}',
+            {% set i = i+1 %}
+            {% endfor %}
+        ],
+        labels: [
+            {% for key in data.keys %}
+            '{{ key.label }}',
+            {% endfor %}
+        ],
+        hideHover: 'auto',
+        xLabelAngle: 35
+    });
+
+});
+</script>
+
+<div id="{{ data.id }}"></div>

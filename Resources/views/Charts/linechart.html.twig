@@ -1,0 +1,60 @@
+
+
+{% if data.values != null %}
+
+<script type="text/javascript">
+    $(function() {
+
+        var bar = new Morris.Line({
+            element: '{{ data.id }}',
+            resize: true,
+            data: [
+                {% for x,yValues in data.values %}
+                {
+                    x: '{{ x }}',
+
+                    {% set i = 0 %}
+                    {% for y in yValues %}
+                    y{{ i }}: {{ y }},
+                    {% set i = i+1 %}
+                    {% endfor %}
+
+                },
+                {% endfor %}
+            ],
+            lineColors: [
+                '#00a65a',
+                '#f56954',
+                '#57B4DE'
+            ],
+            xkey: 'x',
+            ykeys: [
+                {% set i = 0 %}
+                {% for y in data.values|first %}
+                'y{{ i }}',
+                {% set i = i+1 %}
+                {% endfor %}
+            ],
+
+
+            labels: [
+                {% for key in data.keys %}
+                '{{ key.label }}',
+                {% endfor %}
+            ],
+            smooth: {% if smooth %}true{% else %}false{% endif %},
+            hideHover: 'auto',
+            parseTime: false,
+            xLabelAngle: 35
+        });
+
+    });
+</script>
+{% else %}
+
+<p class="alert alert-info">{% trans %}No data available for this period.{% endtrans %}</p>
+
+{% endif %}
+
+<div id="{{ data.id }}"></div>
+

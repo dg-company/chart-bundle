@@ -1,0 +1,112 @@
+<style type="text/css" media="screen">
+
+    #rangeSlider_{{ id }} {
+        width: 100%;
+        text-align: center;
+        position: relative;
+        padding-top: 5px;
+        border: 1px solid #d2d6de;
+        background-color: #fff;
+        border-radius: 5px;
+        height: 34px;
+        margin: 0px;
+    }
+
+    #rangeSlider_{{ id }} .slider {
+        width: 100% !important;
+    }
+
+    #rangeSlider_{{ id }} .slider-handle {
+        opacity: 1;
+        background: #333;
+        width: 15px;
+        height: 15px;
+        margin-top: -3px;
+        box-shadow: none;
+    }
+
+    #rangeSlider_{{ id }} .slider-selection {
+        background: #888;
+    }
+
+    #rangeSlider_{{ id }} .slider-track {
+        background: #ddd;
+        height: 8px;
+    }
+
+    #rangeSlider_{{ id }} .slider-value-panel {
+        background-color: #fff;
+        white-space: nowrap;
+    }
+
+    .slider-value-panel {
+        min-width: 30px;
+        max-width: 50%;
+        border-radius: 3px;
+        background-color: #3A506C;
+    }
+
+</style>
+
+
+<script type="text/javascript">
+    $(function () {
+
+        var container = $("#rangeSlider_{{ id }}");
+
+        var submitTimeout = undefined;
+
+        var submit = function() {
+
+            var url = "{{ dgcChart_getFilterURL(id, {
+                'min' : '__MIN__',
+                'max' : '__MAX__'
+            }) }}";
+
+            url = url.replace(/__MIN__/, min);
+            url = url.replace(/__MAX__/, max);
+
+            window.location.href = url;
+
+        };
+
+        var rangeSlider = container.find("input").slider({
+            id: "{{ id }}",
+            min: {{ rangeMin }},
+            max: {{ rangeMax }},
+            range: true,
+            value: [{{ min }}, {{ max }}]
+        });
+
+        window.rangeSlider = rangeSlider;
+
+        rangeSlider.on('slide', function (slideEvt) {
+            min = slideEvt.value[0];
+            max = slideEvt.value[1];
+
+            container.find("span").first().text(min + ' {{ unit }}');
+            container.find("span").last().text(max + ' {{ unit }}');
+
+            if (submitTimeout) window.clearTimeout(submitTimeout);
+            submitTimeout = window.setTimeout(submit, 500);
+
+        });
+
+    });
+</script>
+
+<div id="rangeSlider_{{ id }}" class="row">
+
+    <div class="col-lg-2 col-md-12" style="padding: 0px;">
+        <span class="slider-value-panel">{{ min }} {{ unit }}</span>
+    </div>
+
+    <div class="col-lg-8 col-md-12">
+        <input type="text">
+    </div>
+
+    <div class="col-lg-2 col-md-12" style="padding: 0px;">
+        <span class="slider-value-panel">{{ max }} {{ unit }}</span>
+    </div>
+
+</div>

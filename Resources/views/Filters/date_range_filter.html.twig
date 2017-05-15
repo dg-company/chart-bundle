@@ -1,0 +1,51 @@
+<script type="application/javascript">
+    $(function() {
+
+        $('#{{ id }}').daterangepicker({
+            locale: {
+                format: 'DD.MM.YYYY',
+                customRangeLabel: '{% trans %}Custom Range{% endtrans %}',
+                applyLabel: '{% trans %}Apply{% endtrans %}',
+                cancelLabel: '{% trans %}Cancel{% endtrans %}'
+            },
+            ranges: {
+
+                '{% trans %}Today{% endtrans %}': [moment(), moment()],
+                '{% trans %}Yesterday{% endtrans %}': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                '{% trans %}Last 7 Days{% endtrans %}': [moment().subtract(6, 'days'), moment()],
+                '{% trans %}Last 30 Days{% endtrans %}': [moment().subtract(29, 'days'), moment()],
+                '{% trans %}This Month{% endtrans %}': [moment().startOf('month'), moment().endOf('month')],
+                '{% trans %}Last Month{% endtrans %}': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+
+            },
+            linkedCalendars: true,
+            startDate: '{{ startDate|date("d.m.Y") }}',
+            endDate: '{{ endDate|date("d.m.Y") }}',
+            maxDate: (moment()),
+            {% if startDate == false %}
+                autoUpdateInput: false
+            {% endif %}
+        },
+        function callback(start, end, label) {
+
+            var url = "{{ dgcChart_getFilterURL(id, {
+                'start' : '__START__',
+                'end' : '__END__'
+            }) }}";
+
+            url = url.replace(/__START__/, start.format("YYYY-MM-DD"));
+            url = url.replace(/__END__/, end.format("YYYY-MM-DD"));
+
+            window.location.href = url;
+
+        });
+
+    });
+</script>
+
+<div class="input-group" style="margin-bottom: 5px">
+    <div class="input-group-addon" style="border-top-left-radius: 5px;border-bottom-left-radius: 5px;">
+        <i class="fa fa-calendar"></i>
+    </div>
+    <input type="text" class="form-control" id="{{ id }}" style="margin-right: 2px;width: 100%;border-top-right-radius: 5px;border-bottom-right-radius: 5px;" placeholder="{% trans %}Select a date range{% endtrans %}">
+</div>

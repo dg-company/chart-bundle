@@ -1,0 +1,437 @@
+<script type="text/javascript">
+
+    $(function () {
+
+        var myChart = echarts.init(document.getElementById('{{ data.id }}'), 'macarons');
+
+        {% if data.values == null %}
+            {% set horizontal = false %}
+        {% endif %}
+
+        {% set defaultWidth = 1.5 %}
+
+        var option = {
+
+            tooltip: {
+                formatter: '{% if data.values == null %}{a}{% else %}{{ tooltipFormat|raw }}{% endif %}',
+                trigger: 'axis'
+            },
+            color: {{ data.colors|json_encode|raw }},
+            grid: {
+                x:'10%',
+                x2:'3%',
+                top: '7%',
+                bottom: '15%',
+                borderColor: '#73A4C3'
+            },
+            toolbox: {
+                show: {% if showToolbar %}true{% else %}false{% endif %},
+                color: {{ data.colors|json_encode|raw }},
+                effectiveColor: '#000',
+                feature: {
+                    dataView: {
+                        show: true,
+                        title: '{% trans %}View data{% endtrans %}',
+                        readOnly: false,
+                        lang: ['{% trans %}Data{% endtrans %}', '{% trans %}Cancel{% endtrans %}', '{% trans %}Save{% endtrans %}']
+                    },
+                    magicType: {
+                        show: true,
+                        type: ['line', 'bar', 'stack', 'tiled'], //['line', 'bar', 'stack', 'tiled', 'force', 'chord', 'pie', 'funnel']
+                        title: {
+                            line: '{% trans %}Line{% endtrans %}',
+                            bar: '{% trans %}Bar{% endtrans %}',
+                            stack: '{% trans %}Stacked{% endtrans %}',
+                            tiled: '{% trans %}Tiled{% endtrans %}',
+                            force: '{% trans %}Force{% endtrans %}',
+                            chord: '{% trans %}Chord{% endtrans %}',
+                            pie: '{% trans %}Pie{% endtrans %}',
+                            funnel: '{% trans %}Funnel{% endtrans %}'
+                        }
+                    },
+                    restore: {
+                        show: true,
+                        title: '{% trans %}Restore{% endtrans %}'
+                    }
+                }
+            },
+            calculable: false,
+            legend: {
+
+                show: {% if data.legendHidden %}false{% else %}true{% endif %},
+                y: 'bottom',
+                data: [
+                    {% for keyName,keyInfo in data.keys %}
+                    '{{ keyInfo.label|raw }}',
+                    {% endfor %}
+                ]
+            },
+            {% if horizontal %}yAxis{% else %}xAxis{% endif %}: [
+                {
+                    {% if showSplitLines == false %}
+                    splitArea: {show: false},
+                    splitLine: {show: false},
+                    {% endif %}
+
+                    axisLine: {
+                        lineStyle: {
+                            color: '#888'
+                        }
+                    },
+                    axisTick: {
+                        {% if data.values == null %}show: false,{% endif %}
+                        lineStyle: {
+                            color: '#888'
+                        },
+                        textstyle:{
+                            align: 'center'
+                        }
+                    },
+                    axisLabel: {
+
+                        interval: '{{ xAxisInterval }}',
+                        textStyle: {align: 'left'},
+                        formatter: (function() {
+                            return function (value) {
+                                return "" + value + "  ";
+                            }
+                        })()
+                    },
+                    type: 'category',
+                    name: '{{ data.xLabel }}',
+                    data: [
+                        {% if data.values != null %}
+                        {% for x,yValues in data.values %}
+                        '{{ x|raw }}',
+                        {% endfor %}
+                        {% else %}
+                        {% trans %}'No data available'{% endtrans %}
+                        {% endif %}
+                    ],
+                    {% if not showXAxis %}show: false{% endif %}
+                }
+            ],
+            {% if horizontal %}xAxis{% else %}yAxis{% endif %}: [
+                {
+                    {% if showSplitLines == false %}
+                    splitArea: {show: false},
+                    splitLine: {show: false},
+                    {% endif %}
+
+                    scale: '{{ relativeScale }}',
+                    axisLine: {
+                        lineStyle: {
+                            color: '#888'
+                        }
+
+                    },
+                    axisTick: {
+                        {% if data.values == null %}show: false,{% endif %}
+                        lineStyle: {
+                            color: '#888'
+                        }
+                    },
+                    type: 'value',
+
+                    name: '{{ data.yOptions[0].label|default("")|raw }}',
+                    axisLabel: {
+                        {% if data.values == null %}show: false,{% endif %}
+                        interval: '{{ yAxisInterval }}',
+                        margin: 7,
+                        textStyle: {
+                            align: 'right'
+                        },
+                        {#formatter: '{{ data.yOptions[0].prefix|default("") }} {value} {{ data.yOptions[0].suffix|default("") }}'#}
+                        formatter: (function() {
+                            return function (input) {
+                                return input.toLocaleString();
+                            };
+                        })()
+                    },
+
+                    {% if not showYAxis %}show: false{% endif %}
+                },
+                {% if data.yOptions|length > 1 %}
+                {% for options in data.yOptions|slice(1) %}
+
+                {
+                    {% if showSplitLines == false %}
+                    splitArea: {show: false},
+                    splitLine: {show: false},
+                    {% endif %}
+
+                    axisLine: {
+                        lineStyle: {
+                            color: '#888'
+                        }
+                    },
+                    axisTick: {
+                        {% if data.values == null %}show: false,{% endif %}
+                        lineStyle: {
+                            color: '#888'
+                        }
+                    },
+                    type: 'value',
+
+                    name: '{{ options.label|default("")|raw }}',
+                    axisLabel: {
+
+                        textStyle: {
+                            align: '{% if horizontal %}right{% else %}left{% endif %}'
+                        },
+
+                        formatter: '{{ options.prefix|default("") }} {value} {{ options.suffix|default("") }}'
+                    },
+                    {% if not showYAxis %}show: false{% endif %}
+                },
+
+                {% endfor %}
+                {% endif %}
+
+            ],
+            series: [
+
+                {% for keyName,keyInfo in data.keys %}
+                {
+
+                    name: {% if data.values != null %}'{{ keyInfo.label|raw }}'{% else %}{% trans %}'No data available'{% endtrans %}{% endif %},
+                    type: '{{ keyInfo.options.type|default("bar") }}',
+                    itemStyle: {normal: {areaStyle: {type: 'default'}}},
+                    {% if horizontal %}
+                    xAxisIndex: {{ keyInfo.options.yAxisIndex|default("0") }},
+                    {% else %}
+                    yAxisIndex: {{ keyInfo.options.yAxisIndex|default("0") }},
+                    {% endif %}
+                    {% set maxInData = 0 %}
+                    data: [
+                        {% if data.values != null %}
+                        {% for x,yValues in data.values %}
+                        {{ yValues[keyName] }},
+
+                        {% if maxInData<yValues[keyName] %}
+                        {% set maxInData = yValues[keyName] %}
+                        {% endif %}
+
+                        {% endfor %}
+                        {% else %} '-',{% endif %}
+                    ],
+                    label: {
+                        normal: {
+                            textStyle: {
+                                fontSize: 12
+                            },
+                            show: true,
+                            position: '{{ seriesLabelPosition }}',
+                            formatter: (function(hideLabelLengthPercent, maxValue) {
+                                {% if hideLabelLengthDependent %}
+
+                                    return function (value) {
+                                        var dataValue = value.data; //
+                                        var hideLabelLengthAmount = maxValue * hideLabelLengthPercent / 100;
+                                        if (dataValue <= hideLabelLengthAmount) return "";
+
+                                        //cut label
+                                        var displayLength = 40;
+                                        if (value.name.length > displayLength) return value.name.substring(0, displayLength) + "...";
+
+                                        return value.name;
+                                    };
+
+                                {% else %}
+
+                                    return '{{ labelFormat }}';
+
+                                {% endif %}
+                            })()
+                        }
+                    }
+                },
+
+                {% endfor %}
+
+
+            ]
+        };
+
+        myChart.setOption(option);
+
+        $(window).bind("resize", function () {
+            myChart.resize();
+        });
+
+        $("#{{ data.id }}_wrapper .dgcChartBundle_showAllData").bind("click", function (e) {
+            $("#{{ data.id }}_wrapper table .hidden").removeClass("hidden");
+            $(this).remove();
+            $(".dgcChartBundle_datatable_fade").remove();
+            e.preventDefault();
+            e.stopPropagation();
+        });
+
+        $("#{{ data.id }}_wrapper .dgcChartBundle_downloadImage").bind("click", function (e) {
+
+            var url = myChart.getDataURL({
+                type: 'PNG',
+                backgroundColor: '#ffffff',
+                pixelRatio: 2
+            });
+
+            $(this).attr("href", url);
+
+        });
+
+        myChart.ids = [
+            {% for x,yValues in data.values %}
+            {% if yValues['_id'] is defined %}
+            '{{ yValues['_id'] }}',
+            {% endif %}
+            {% endfor %}
+        ];
+
+        myChart.bind = function (eventName, callback) {
+
+            if (eventName === "click") {
+
+                myChart.on("click", function (e) {
+                    if (myChart.ids[e.dataIndex] !== undefined) {
+                        callback(myChart.ids[e.dataIndex]);
+                    } else {
+                        callback(e.dataIndex);
+                    }
+                });
+
+            }
+
+        };
+
+
+        if (!window.echartInstances) {
+            window.echartInstances = {};
+        }
+        window.echartInstances['{{ data.id }}'] = myChart;
+
+
+    });
+
+</script>
+
+
+<div id="{{ data.id }}_wrapper">
+
+    {% if data.title != "" %}
+        <h3>
+            {{ data.title }}
+        </h3>
+    {% endif %}
+
+    <div class="row" id="{{ data.id }}" style="width: {{ containerWidth }}; height: {{ containerHeight }};"></div>
+
+    {% if data.values != null %}
+
+        {% if showDownload %}
+            <div style="text-align: center;">
+
+                <a class="btn btn-sm" href="{{ dgcChart_addParameter('chartDownload', 'csv') }}" target="_blank">
+                    <i class="fa fa-table"></i>
+                    {% trans %}Download CSV{% endtrans %}
+                </a>
+
+                <a class="btn btn-sm" href="#" class="dgcChartBundle_downloadImage" target="_blank" download="chart.png">
+                    <i class="fa fa-image"></i>
+                    {% trans %}Download{% endtrans %}
+                </a>
+
+            </div>
+        {% endif %}
+
+        {% if showData %}
+
+            <table class="table table-bordered table-striped dataTable" style="text-align: center">
+                <thead>
+                <tr role="row">
+                    <th style="text-align: center">{{ data.xLabel }}</th>
+                    {% for keyName,keyInfo in data.keys %}
+                        <th style="text-align: center">{{ keyInfo.label }}</th>
+                    {% endfor %}
+                </tr>
+                </thead>
+                <tbody>
+                {% if horizontal %}
+                    {% for x,yValues in data.values | reverse %}
+
+                        <tr role="row" {% if loop.index > 3 %}class="hidden"{% endif %}>
+                            <td>{{ x }}</td>
+                            {% for yKey,y in yValues %}
+                                <td>{{ y }}</td>
+                            {% endfor %}
+                        </tr>
+
+                    {% endfor %}
+                {% else %}
+                    {% for x,yValues in data.values %}
+
+                        <tr role="row" {% if loop.index > 3 %}class="hidden"{% endif %}>
+                            <td>{{ x }}</td>
+                            {% for yKey,y in yValues[:data.keys | length] %}
+                                <td>{{ y }}</td>
+                            {% endfor %}
+                        </tr>
+
+
+                    {% endfor %}
+                {% endif %}
+
+                </tbody>
+                <tfoot class="hidden">
+                <tr role="row">
+                    <th></th>
+                    {% for sum in sums %}
+                        <th>
+                            <table border="0" cellspacing="0" cellpadding="0" width="100%"
+                                   style="text-align: center">
+                                <tr>
+                                    <td width="50%">
+                                        &sum; {{ sum | number_format(2) }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%">
+                                        Ø {{ (sum/(data.values|length))|number_format(2) }}
+                                    </td>
+                                </tr>
+                            </table>
+                        </th>
+                    {% endfor %}
+                </tr>
+                <tr role="row">
+                    <th style="text-align: center;">{{ data.xLabel }}</th>
+                    {% for keyName,keyInfo in data.keys %}
+                        <th style="text-align: center">{{ keyInfo.label }}</th>
+                    {% endfor %}
+                </tr>
+                </tfoot>
+            </table>
+
+            <div style="{% spaceless %}
+
+                height: 111px;
+                width: 100%;
+                margin-top: -111px;
+                position: relative;
+                background: -moz-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+                background: -webkit-linear-gradient(top, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+                background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=0);
+
+            {% endspaceless %}" class="biChartBundle_datatable_fade"></div>
+
+            <div style="margin-top: 10px; text-align: center">
+                <button class="btn btn-sm dgcChartBundle_showAllData">
+                    <i class="fa fa-chevron-down"></i>
+                </button>
+            </div>
+
+        {% endif %}
+
+    {% endif %}
+
+</div>
