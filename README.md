@@ -168,4 +168,36 @@ index.html.twig
 ### Date range filter
 
     $filter = $this->get("dgc_chart.factory.filter")->createDateRangeFilter("test");
-    $filter->setSqlField('date');
+    $filter
+        ->setStartDate(...)
+        ->setEndDate(...)
+        ->setDateFormat(...)
+        ->setSqlField(...)
+        ->setSqlFieldRangeEnd(...)
+        ->setMongoField(...)
+    ;
+    
+## Number range filter
+
+    $filter = $this->get("dgc_chart.factory.filter")->createNumberRangeFilter("test");
+    $filter
+        ->setLabel(...)
+        ->setUnit(...)
+        ->setMin(...)
+        ->setMax(...)
+        ->setRangeMin(...)
+        ->setRangeMax(...)
+        ->setMongoField(...)
+        ->setSqlField(...)
+    ;
+
+## Reference filter (choices)
+
+    $filter = $this->get("dgc_chart.factory.filter")->createReferenceFilter("test");
+    $filter
+        ->setReference(...)
+        ->setChoices(...)
+        ->setLabel(...)
+        ->setMongoField(...)
+        ->addCustomWhereClause(...)
+    ;
