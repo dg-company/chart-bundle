@@ -1,0 +1,33 @@
+<div style="display: inline-block">
+<div class="btn-group">
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+        {{ label }}
+
+        {% if reference is defined and reference is not empty  %}
+            : {{ reference }}
+        {% else %}
+
+        {% endif %}
+
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu">
+
+        <li><a href="{{ dgcChart_getFilterURL(id, {
+            'reference' : null
+        }) }}">
+            {% trans %}Disable{% endtrans %}
+        </a></li>
+
+        <li role="separator" class="divider"></li>
+
+        {% for choice in choices %}
+            <li><a href={{ dgcChart_getFilterURL(id, {
+                'reference' : choice.id,
+            }) }}>{{ choice.name }}</a></li>
+        {% endfor %}
+
+    </ul>
+</div>
+</div>

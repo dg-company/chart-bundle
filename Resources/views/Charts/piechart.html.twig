@@ -1,0 +1,176 @@
+{% if data.values != null %}
+
+    <script type="text/javascript">
+
+        //the label is hidden, when the data value is below a certain amount
+        function seriesFormatPie() {
+            return function (value) {
+                //percent formatting
+
+                //html entities
+                value.name = value.name.replace("&apos;", "");
+                value.name = value.name.replace("&amp;", "&\n");
+                value.name = value.name.replace("&amp;", "&\n");
+                value.name = value.name.replace("&amp;", "&\n");
+                value.name = value.name.replace("&amp;", "&\n");
+                value.name = value.name.replace("&lt;", "<\n");
+                value.name = value.name.replace("&lt;", "<\n");
+                value.name = value.name.replace("&lt;", "<\n");
+                value.name = value.name.replace("&lt;", "<\n");
+                value.name = value.name.replace("&gt;", ">\n");
+                value.name = value.name.replace("&gt;", ">\n");
+                value.name = value.name.replace("&gt;", ">\n");
+                value.name = value.name.replace("&gt;", ">\n");
+                value.name = value.name.replace("|", "\n");
+                value.name = value.name.replace("|", "\n");
+                value.name = value.name.replace("|", "\n");
+                value.name = value.name.replace("/", "\n");
+                value.name = value.name.replace("/", "\n");
+                value.name = value.name.replace("/", "\n");
+
+                value.name = value.name.replace("amp;", "");
+                value.name = value.name.replace("amp;", "");
+                value.name = value.name.replace("amp;", "");
+                value.name = value.name.replace("amp;", "");
+
+                value.name = value.name.replace("#039;s", "");
+                value.name = value.name.replace("#039;s", "");
+                value.name = value.name.replace("#039;s", "");
+                value.name = value.name.replace("#039;s", "");
+
+                value.name = value.name.replace("Ã¶", "ö");
+                value.name = value.name.replace("Ã¤", "ä");
+
+                value.name = value.name.replace("ã¶", "ö");
+                value.name = value.name.replace("ã¤", "ä");
+
+                value.name = value.name.replace("¶", "");
+                value.name = value.name.replace("¤", "");
+                
+                //cut label
+                var displayLength = 22;
+                if (value.name.length > displayLength) return value.name.substring(0, displayLength) + "...";
+                return value.name;
+            }
+        }
+
+        $(function () {
+            var myChart = echarts.init(document.getElementById('{{ data.id }}'), 'macarons');
+            var option = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{{ tooltipFormat }}"
+                },
+                color: {{ data.colors|json_encode|raw }},
+                legend: {
+                    show: {% if data.legendHidden %}false{% else %}true{% endif %},
+                    orient: 'vertical',
+                    left: 'left',
+                    data: [
+                        '{{ (data.keys|first).label|raw }}',
+                    ]
+                },
+                textStyle: {color: "black"},
+                series: [
+                    {
+                        name: '',
+                        type: 'pie',
+                        radius: '78%',
+                        center: ['50%', '50%'],
+                        data: [
+
+                            {# calculate max value #}
+                            {% set max = 0 %}
+                            {% for x,yValues in data.values %}
+                                {% if yValues|first > max %}
+                                    {% set max = yValues|first %}
+                                {% endif %}
+                            {% endfor %}
+
+                            {# output data #}
+                            {% for x,yValues in data.values %}
+                                {% if max == 0 or (yValues|first*100)/max >= thresholdDisplayPieSlice %}
+                                    {
+                                        value: {{ yValues|first }},
+                                        name: '{{ yValues|slice(1,1)|first|trim|capitalize }}',
+                                        {% if max == 0 or (yValues|first*100)/max < thresholdDisplayPieSliceDescription %}
+                                        itemStyle: {
+                                            normal: {
+                                                label: {
+                                                    show: false,
+                                                    position: 'inner'
+                                                }
+                                            }
+                                        }
+                                        {% endif %}
+                                    },
+                                {% endif %}
+                            {% endfor %}
+                        ],
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        },
+                        startAngle: {{ startAngle }},
+                        label: {
+                            normal: {
+                                textStyle: {
+                                    fontSize: 12
+                                },
+                                show: true,
+                                formatter: seriesFormatPie()
+                            }
+                        }
+                    }
+                ]
+            };
+
+            myChart.setOption(option);
+
+            $(window).bind("resize", function () {
+                myChart.resize();
+            });
+            $(".sidebar-toggle").bind("click", function () {
+                window.setTimeout(function () {
+                    myChart.resize();
+                }, 400);
+            });
+
+            $("#{{ data.id }}_wrapper .box-body button").bind("click", function (e) {
+                $("#{{ data.id }}_wrapper table .hidden").removeClass("hidden");
+                $(this).remove();
+                $(".chartBundle_datatable_fade").remove();
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            $("#{{ data.id }}_wrapper .dgcChartBundle_downloadImage").bind("click", function (e) {
+
+                var url = myChart.getDataURL({
+                    type: 'PNG',
+                    backgroundColor: '#ffffff',
+                    pixelRatio: 2
+                });
+
+                $(this).attr("href", url);
+
+            });
+
+            if (!window.echartInstances) {
+                window.echartInstances = {};
+            }
+            window.echartInstances['{{ data.id }}'] = myChart;
+
+        });
+
+    </script>
+
+    <div class="row" id="{{ data.id }}" style="width: 100%; height: 100%;"></div>
+
+{% else %}
+    <br><p class="alert alert-info">{% trans %}No data available for this period.{% endtrans %}</p>
+
+{% endif %}
