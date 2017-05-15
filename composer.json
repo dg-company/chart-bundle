@@ -1,0 +1,30 @@
+{
+  "name": "dgc/chart-bundle",
+  "type": "symfony-bundle",
+  "description": "Chart bundle",
+  "keywords": ["Charts", "Morris", "eCharts", "Symfony", "SQL", "MongoDB"],
+  "homepage": "",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Tobias Kempkensteffen",
+      "email": "tobias.kempkensteffen@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "symfony/framework-bundle": "~3.0",
+    "symfony/dependency-injection": "~3.0"
+  },
+  "require-dev": {
+
+  },
+  "suggest": {
+    "symfony/web-profiler-bundle": "To use the data collector.",
+    "doctrine/orm": "To build charts using SQL queries",
+    "doctine/odm": "To build charts using MongoDB queries"
+  },
+  "autoload": {
+    "psr-4": { "DGC\\ChartBundle\\": "" }
+  }
+}
