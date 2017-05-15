@@ -3,12 +3,14 @@
   "type": "symfony-bundle",
   "description": "Chart bundle",
   "keywords": ["Charts", "Morris", "eCharts", "Symfony", "SQL", "MongoDB"],
-  "homepage": "",
   "license": "MIT",
   "authors": [
     {
       "name": "Tobias Kempkensteffen",
       "email": "tobias.kempkensteffen@gmail.com"
+    },
+    {
+      "name": "Daniel Menke"
     }
   ],
   "require": {

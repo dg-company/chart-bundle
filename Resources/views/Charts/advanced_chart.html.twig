@@ -39,14 +39,14 @@
                         show: true,
                         type: ['line', 'bar', 'stack', 'tiled'], //['line', 'bar', 'stack', 'tiled', 'force', 'chord', 'pie', 'funnel']
                         title: {
-                            line: '{% trans %}Line{% endtrans %}',
-                            bar: '{% trans %}Bar{% endtrans %}',
-                            stack: '{% trans %}Stacked{% endtrans %}',
-                            tiled: '{% trans %}Tiled{% endtrans %}',
-                            force: '{% trans %}Force{% endtrans %}',
-                            chord: '{% trans %}Chord{% endtrans %}',
-                            pie: '{% trans %}Pie{% endtrans %}',
-                            funnel: '{% trans %}Funnel{% endtrans %}'
+                            line: '{% trans %}Line chart{% endtrans %}',
+                            bar: '{% trans %}Bar chart{% endtrans %}',
+                            stack: '{% trans %}Stacked chart{% endtrans %}',
+                            tiled: '{% trans %}Tiled chart{% endtrans %}',
+                            force: '{% trans %}Force chart{% endtrans %}',
+                            chord: '{% trans %}Chord chart{% endtrans %}',
+                            pie: '{% trans %}Pie chart{% endtrans %}',
+                            funnel: '{% trans %}Funnel chart{% endtrans %}'
                         }
                     },
                     restore: {
@@ -105,7 +105,7 @@
                         '{{ x|raw }}',
                         {% endfor %}
                         {% else %}
-                        {% trans %}'No data available'{% endtrans %}
+                        '{% trans %}No data available{% endtrans %}'
                         {% endif %}
                     ],
                     {% if not showXAxis %}show: false{% endif %}
@@ -194,7 +194,7 @@
                 {% for keyName,keyInfo in data.keys %}
                 {
 
-                    name: {% if data.values != null %}'{{ keyInfo.label|raw }}'{% else %}{% trans %}'No data available'{% endtrans %}{% endif %},
+                    name: {% if data.values != null %}'{{ keyInfo.label|raw }}'{% else %}'{% trans %}No data available{% endtrans %}'{% endif %},
                     type: '{{ keyInfo.options.type|default("bar") }}',
                     itemStyle: {normal: {areaStyle: {type: 'default'}}},
                     {% if horizontal %}
@@ -337,7 +337,7 @@
 
                 <a class="btn btn-sm" href="#" class="dgcChartBundle_downloadImage" target="_blank" download="chart.png">
                     <i class="fa fa-image"></i>
-                    {% trans %}Download{% endtrans %}
+                    {% trans %}Download PNG{% endtrans %}
                 </a>
 
             </div>

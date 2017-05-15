@@ -55,7 +55,7 @@ TestController.php
     $aggregator
         ->setDatabaseConnection($this->get("doctrine.dbal.ext_connection"))
         ->getQueryBuilder()
-        ->select('`date`, EM, CB, CK')
+        ->select('`date`, orders, clients')
         ->from('stats')
         ->orderBy('date', 'DESC')
     ;
@@ -63,11 +63,10 @@ TestController.php
     // Set which fields will be used for X and Y values 
     $aggregator
         ->setXField('date')
-        ->addYField('EM', 'EM')
-        ->addYField('CB', 'CB')
-        ->addYField('CK', 'CK')
+        ->addYField('orders', 'Number of orders')
+        ->addYField('clients', 'Number of clients')
         ->addResultCallback(function ($data) {
-            return $data;
+            return $data; //optional: manipulate data used to render the chart
         })
     ;
 
@@ -99,3 +98,74 @@ index.html.twig
 - LineChart (Morris.js)
 - PieChart (Morris.js)
 - BarChart (Morris.js)
+
+### AdvancedChart
+
+    $chart = $this->get('dgc_chart.factory.chart')->createAdvancedChart('test');
+    $chart
+        ->setHeight(...)
+        ->setWidth(...)
+        ->setLabelFormat(...)
+        ->setSeriesLabelPosition(...)
+        ->setXAxisLabelInterval(...)
+        ->setYAxisLabelInterval(...)
+        ->setRelativeScale(...)
+        ->setHorizontal(...)
+        ->showXAxis(...)
+        ->showYAxis(...)
+        ->showToolbar(...)
+        ->showData(...)
+        ->showDownload(...)
+        ->showSplitLines(...)
+        ->setTooltipFormat(...)
+        ->hideLabelLengthDependent(...)
+    
+        ->setTitle("Just a test")
+        ->addAggregator($aggregator)
+        ->addFilter($filter)
+    ;
+    
+### LineChart
+
+    $chart = $this->get('dgc_chart.factory.chart')->createLineChart('test');
+    $chart
+        ->setSmooth(...)        
+    
+        ->setTitle("Just a test")
+        ->addAggregator($aggregator)
+        ->addFilter($filter)
+    ;
+
+### PieChart
+
+    $chart = $this->get('dgc_chart.factory.chart')->createPieChart('test');
+    $chart
+        ->setStartAngle()
+        ->formatTooltip()
+        ->setThresholdDisplayPieSlice()
+        ->setThresholdDisplayPieSliceDescription()        
+    
+        ->setTitle("Just a test")
+        ->addAggregator($aggregator)
+        ->addFilter($filter)
+    ;
+
+### BarChart
+
+    $chart = $this->get('dgc_chart.factory.chart')->createBarChart('test');
+    $chart
+        ->setTitle("Just a test")
+        ->addAggregator($aggregator)
+        ->addFilter($filter)
+    ;
+    
+## Filter
+
+- Date range filter
+- Number range filter
+- Reference filter (choices)
+
+### Date range filter
+
+    $filter = $this->get("dgc_chart.factory.filter")->createDateRangeFilter("test");
+    $filter->setSqlField('date');
