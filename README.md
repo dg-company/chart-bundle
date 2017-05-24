@@ -159,6 +159,15 @@ index.html.twig
         ->addFilter($filter)
     ;
     
+### ListChart
+    
+    $chart = $this->get('dgc_chart.factory.chart')->createListChart('test');
+    $chart
+        ->setTitle("Just a test")
+        ->addAggregator($aggregator)
+        ->addFilter($filter)
+    ;
+    
 ## Filter
 
 - Date range filter

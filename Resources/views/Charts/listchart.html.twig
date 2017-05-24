@@ -1,25 +1,37 @@
-{% if compact == false %}
 
-    <div class="box">
-        <div class="box-header">
-            <h3 class="box-title">{{ data.title }}</h3>
-        </div>
-        <div class="box-body">
-
-{% endif %}
 
 {% if data.values != null %}
     <table class="table table-bordered table-striped dataTable">
         <thead>
         <tr role="row">
+
             {% for key in data.keys %}
-                <th>{{ key.label }}</th>
+                <th>
+
+                        {% if key.field == data.sort_by %}
+                            <a href="{{ path(app.request.attributes.get('_route'),
+                            app.request.attributes.get('_route_params')|merge({'sort_by': key.field, 'sort_order': data.sort_order})) }}">{{ key.label }}
+
+                            {% if data.sort_order == 'ASC' %}
+                                <i class="fa fa-caret-down" aria-hidden="true"></i>
+                            {% else %}
+                                <i class="fa fa-caret-up" aria-hidden="true"></i>
+                            {% endif %}
+                            </a>
+                        {% else %}
+                            <a href="{{ path(app.request.attributes.get('_route'),
+                            app.request.attributes.get('_route_params')|merge({'sort_by': key.field, 'sort_order': 'DESC'})) }}">{{ key.label }}</a>
+                        {% endif %}
+
+                </th>
             {% endfor %}
         </tr>
         </thead>
         <tbody>
+
         {% for x,yValues in data.values %}
             <tr role="row">
+
                 {% for key,keyInfo in data.keys %}
                     <td>
                         {{ yValues[key]|raw }}
@@ -29,10 +41,4 @@
         {% endfor %}
         </tbody>
     </table>
-{% endif %}
-
-{% if compact == false %}
-
-        </div>
-    </div>
 {% endif %}

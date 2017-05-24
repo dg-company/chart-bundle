@@ -2,10 +2,11 @@
 
 namespace DGC\ChartBundle\Chart;
 
+use DGC\ChartBundle\Aggregator\MongoAggregator;
+use DGC\ChartBundle\Aggregator\SqlAggregator;
+
 class ListChart extends AbstractChart
 {
-    /** @var bool */
-    protected $compact = false;
 
     /** @var null */
     protected $viewData = null;
@@ -13,6 +14,11 @@ class ListChart extends AbstractChart
     /** @var null */
     protected $exportFields = null;
 
+    /** @var string */
+    protected $sortOrder = 'DESC';
+
+    /** @var string */
+    protected $sortBy = null;
 
     /**
      * generates csv output
@@ -24,7 +30,7 @@ class ListChart extends AbstractChart
 
         //header
         foreach ($data['keys'] as $key) {
-            if( (!in_array($key['field'],$this->exportFields)) ) continue; //filter
+            if ((!in_array($key['field'], $this->exportFields))) continue; //filter
 
             if (isset($key['label'])) {
                 $header[] = $key['label'];
@@ -40,10 +46,10 @@ class ListChart extends AbstractChart
 
             //filter row
             $rowFiltered = array();
-            foreach($row as $key => $value){
-                $key = substr($key,2); //remove index chars
-                if( (!in_array($key,$this->exportFields)) ) continue;
-                $rowFiltered[$key]=$value;
+            foreach ($row as $key => $value) {
+                $key = substr($key, 2); //remove index chars
+                if ((!in_array($key, $this->exportFields))) continue;
+                $rowFiltered[$key] = $value;
             }
             $csvData[] = array_values($rowFiltered);
         }
@@ -64,7 +70,8 @@ class ListChart extends AbstractChart
      *
      * @param $exportFields
      */
-    public function setExportFields($exportFields){
+    public function setExportFields($exportFields)
+    {
         $this->exportFields = $exportFields;
     }
 
@@ -79,17 +86,40 @@ class ListChart extends AbstractChart
         return $this->viewData;
     }
 
-
     /**
-     * Enable compact design
-     *
-     * @param bool $compact
-     * @return self
+     * sorts the list fields according to url parameters
      */
-    public function setCompact($compact = true)
+
+    private function sort()
     {
-        $this->compact = $compact;
-        return $this;
+
+        $this->sortBy = $this->requestStack->getCurrentRequest()->get('sort_by');
+
+        if ($this->requestStack->getCurrentRequest()->get('sort_order')) {
+            $this->sortOrder = $this->requestStack->getCurrentRequest()->get('sort_order');
+        }
+
+        foreach ($this->aggregators as $aggregator) {
+
+            if ($this->sortBy) {
+                if ($aggregator instanceof SqlAggregator) {
+
+                    $aggregator
+                        ->getQueryBuilder()
+                        ->OrderBy($this->sortBy, $this->sortOrder);
+
+                } elseif ($aggregator instanceof MongoAggregator) {
+
+                    $aggregator->sort($this->sortBy, $this->sortOrder);
+                }
+
+                if ($this->sortOrder == 'ASC') {
+                    $this->sortOrder = 'DESC';
+                } else {
+                    $this->sortOrder = 'ASC';
+                }
+            }
+        }
     }
 
 
@@ -98,29 +128,35 @@ class ListChart extends AbstractChart
      */
     public function render()
     {
+        $this->sort();
+
         $data = $this->getViewData();
+
+        $data["sort_order"] = $this->sortOrder;
+        $data["sort_by"] = $this->sortBy;
 
         $values = $data["values"];
         $place = 1;
 
         $valuesNew = array();
-        foreach($values as $valueName => $value){
+        foreach ($values as $valueName => $value) {
             //shorten value name
             $limit = 50;
-            if(strlen($valueName)>$limit){
-                $valueName = substr($valueName,0,$limit) . "...";
+            if (strlen($valueName) > $limit) {
+                $valueName = substr($valueName, 0, $limit) . "...";
             }
 
-            $value["place"]=$place;
+            $value["place"] = $place;
             $place++;
-            $valuesNew[$valueName]=$value;
+            $valuesNew[$valueName] = $value;
         }
+
 
         $data["values"] = $valuesNew;
 
+
         return $this->templateEngine->render("DGCChartBundle:Charts:listchart.html.twig", array(
             "data" => $data,
-            "compact" => $this->compact,
         ));
     }
 }
