@@ -9,13 +9,13 @@ services:
     dgc_chart.factory.chart:
         class: DGC\ChartBundle\Chart\ChartFactory
         arguments:
-          - "@templating"
+          - "@twig"
           - "@request_stack"
 
     dgc_chart.factory.filter:
         class: DGC\ChartBundle\Filter\FilterFactory
         arguments:
-          - '@templating'
+          - '@twig'
           - '@request_stack'
 
     # TWIG EXTENSIONS

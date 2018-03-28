@@ -2,7 +2,7 @@
 
 namespace DGC\ChartBundle\Chart;
 
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as TemplateEngineInterface;
+use Twig\Environment as TemplateEngineInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 

@@ -4,7 +4,7 @@ namespace DGC\ChartBundle\Chart;
 
 use DGC\ChartBundle\Aggregator\AbstractAggregator;
 use DGC\ChartBundle\Filter\AbstractFilter;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface as TemplateEngineInterface;
+use Twig\Environment as TemplateEngineInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 abstract class AbstractChart
