@@ -24,7 +24,7 @@ class LineChart extends AbstractChart
      */
     public function render()
     {
-        return $this->templateEngine->render("DGCChartBundle:Charts:linechart.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Charts/linechart.html.twig", array(
             "data" => $this->getViewData(),
             "smooth" => $this->smooth
         ));

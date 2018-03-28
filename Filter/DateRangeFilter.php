@@ -170,7 +170,7 @@ class DateRangeFilter extends AbstractFilter
         $startDate = isset($requestParameters['start'])?(new \DateTime($requestParameters['start'])):$this->startDate;
         $endDate = isset($requestParameters['end'])?(new \DateTime($requestParameters['end'])):$this->endDate;
 
-        return $this->templateEngine->render("DGCChartBundle:Filters:date_range_filter.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Filters/date_range_filter.html.twig", array(
             "id" => $this->getId(),
             "startDate" => $startDate,
             "endDate" => $endDate,

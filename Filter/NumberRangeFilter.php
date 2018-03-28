@@ -216,7 +216,7 @@ class NumberRangeFilter extends AbstractFilter
         $min = isset($requestParameters['min']) ? $requestParameters['min'] : $this->min;
         $max = isset($requestParameters['max']) ? $requestParameters['max'] : $this->max;
 
-        return $this->templateEngine->render("DGCChartBundle:Filters:number_range_filter.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Filters/number_range_filter.html.twig", array(
             "id" => $this->getId(),
             "label" => $this->getLabel(),
             "rangeMin"=>$this->getRangeMin(),

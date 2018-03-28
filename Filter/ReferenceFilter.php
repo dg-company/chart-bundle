@@ -164,7 +164,7 @@ class ReferenceFilter extends AbstractFilter
 
         $reference = isset($requestParameters['reference']) ? $requestParameters['reference'] : $this->reference;
 
-        return $this->templateEngine->render("DGCChartBundle:Filters:reference_filter.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Filters/reference_filter.html.twig", array(
             "id" => $this->getId(),
             "label" => $this->getLabel(),
             "reference" => $reference,

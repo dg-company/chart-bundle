@@ -155,7 +155,7 @@ class ListChart extends AbstractChart
         $data["values"] = $valuesNew;
 
 
-        return $this->templateEngine->render("DGCChartBundle:Charts:listchart.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Charts/listchart.html.twig", array(
             "data" => $data,
         ));
     }

@@ -10,7 +10,7 @@ class BarChart extends AbstractChart
      */
     public function render()
     {
-        return $this->templateEngine->render("DGCChartBundle:Charts:barchart.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Charts/barchart.html.twig", array(
             "data" => $this->getViewData()
         ));
     }
