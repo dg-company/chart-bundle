@@ -326,7 +326,7 @@ class AdvancedChart extends AbstractChart
 
         }
 
-        return $this->templateEngine->render("DGCChartBundle:Charts:advanced_chart.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Charts/advanced_chart.html.twig", array(
             "data" => $data,
             "horizontal" => $this->horizontal,
             "containerWidth" => $this->containerWidth,

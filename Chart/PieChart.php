@@ -19,7 +19,7 @@ class PieChart extends AbstractChart
     {
         $data = $this->getViewData();
         
-        return $this->templateEngine->render("DGCChartBundle:Charts:piechart.html.twig", array(
+        return $this->templateEngine->render("@DGCChart/Charts/piechart.html.twig", array(
             "data" => $data,
             "startAngle" => $this->startAngle,
             "tooltipFormat" => $this->tooltipFormat,
